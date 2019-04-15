@@ -1,0 +1,17 @@
+<angular-loader></angular-loader>
+<div>
+  <app-saloon-nav>
+      <nav mat-tab-nav-bar>
+          <a mat-tab-link
+             *ngFor="let link of navLinks"
+             [routerLink]="link.path"
+             routerLinkActive #rla="routerLinkActive"
+             [active]="rla.isActive">
+            {{link.label}}
+          </a>
+        </nav>
+    <div class="contentContainer">
+      <router-outlet></router-outlet>
+    </div>
+  </app-saloon-nav>
+</div>
