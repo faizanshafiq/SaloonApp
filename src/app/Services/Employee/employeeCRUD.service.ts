@@ -59,7 +59,7 @@ export class EmployeeCRUDService  implements OnInit{
     return this.http.get<Employee>(this.API_ADDRESS+'/api/getEmployeeById/'+id,this.httpOptions);
   }
   public getAllEmployees( page:number=1,pageItems:number=5) : Observable<Employee[]>
-  {debugger
+  {
     return this.http.get<Employee[]>(this.API_ADDRESS+'/api/ShowAllEmployees/'+page+'/'+pageItems,this.httpOptions);
   }
   public getPaginInfo():Observable<string>

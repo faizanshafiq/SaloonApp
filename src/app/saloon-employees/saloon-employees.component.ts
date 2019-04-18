@@ -11,7 +11,7 @@ import { AuthTokenService } from '../auth-token.service';
 import { BehaviorSubject } from 'rxjs';
 import { FormControl } from '@angular/forms';
 import * as $ from 'jquery';
-import { tap } from 'rxjs/operators';
+import { tap, isEmpty } from 'rxjs/operators';
 
 
 
@@ -36,6 +36,8 @@ export class SaloonEmployeesComponent implements OnInit,AfterViewInit{
   dataSource;
   confirmation: Boolean = false;
   selected = new FormControl(0);
+  pageNumber:number;
+  pageSize:number;
   applyFilter(filterValue: string) {
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
@@ -58,9 +60,14 @@ export class SaloonEmployeesComponent implements OnInit,AfterViewInit{
     this.authTokenService.currentToken.subscribe(token => this.token = token)
     this.employee = new Employee();
     this.getAuth();
-    this.dataSource = this.employeeCRUDService.getAllEmployees();
+    
     this.employeeCRUDService.getPaginInfo().subscribe(
-      (x) => {this.PageInfo = x; console.log('getPageInfoCalled '+this.PageInfo)},null,
+      (x) => {this.PageInfo = x; console.log('getPageInfoCalled '+this.PageInfo)
+    ;
+    this.pageNumber = this.PageInfo.split(',')[0];
+    this.pageSize = this.PageInfo.split(',')[1];
+    this.dataSource = this.employeeCRUDService.getAllEmployees(this.pageNumber,this.pageSize);
+  },null,
       () => {this.PageInfoArr = this.PageInfo.split(',');
      
       this.paginator.pageIndex = <number><unknown> this.PageInfoArr[0];
@@ -72,6 +79,7 @@ export class SaloonEmployeesComponent implements OnInit,AfterViewInit{
         }    
       }
     )
+   
     
   }
  
@@ -122,17 +130,24 @@ export class SaloonEmployeesComponent implements OnInit,AfterViewInit{
   Reset() 
   {
     this.employee = new Employee();
+    $('#AddEditBtn').text('Add')
   }
 
   Add() {
     this.showLoader();
-    this.employeeCRUDService.addEditEmployee(this.employee).subscribe
+    if(this.isObjectEmpty(this.employee)) {
+     this.ErrorMessage();
+     this.hideLoader();
+    }
+    else
+      {
+        this.employeeCRUDService.addEditEmployee(this.employee).subscribe
       (
         () => {
           this.hideLoader(),
             this.SuccessMessage()
           this.employee = new Employee()
-          this.dataSource = this.employeeCRUDService.getAllEmployees();
+          this.dataSource = this.employeeCRUDService.getAllEmployees(this.pageNumber,this.pageSize);
         },
         (error) => {
           this.hideLoader(), console.log(error), this.ErrorMessage(),
@@ -151,14 +166,21 @@ export class SaloonEmployeesComponent implements OnInit,AfterViewInit{
             console.log('Complete function called')
         }
       )
+      }
+
   }
   ErrorMessage() 
   {
-    if (!this.errorMessage) {
-      this.errorMessage = true;
-      $('.errorMessage').show();
-
+    if (this.errorMessage) {
+      this.errorMessage = false;
+      $('.errorMessage').show(1000);
+       }
+    else
+    {
+        this.errorMessage = true;
+        $('.errorMessage').hide();
     }
+    $('.errorMessage').hide();
   }
   SuccessMessage() 
   {
@@ -203,9 +225,8 @@ export class SaloonEmployeesComponent implements OnInit,AfterViewInit{
     this.showLoader();
     this.employeeCRUDService.removeEmployee(<number><unknown>this.position).subscribe((result) => {
       console.log(result);
-      this.dataSource = this.employeeCRUDService.getAllEmployees();
+      this.dataSource = this.employeeCRUDService.getAllEmployees(this.pageNumber,this.pageSize);
       this.hideLoader();
-      
     },
     (error)=> console.log(error)
     )
@@ -231,15 +252,25 @@ export class SaloonEmployeesComponent implements OnInit,AfterViewInit{
   {
     this.showLoader();
     this.employee = new Employee();
-    this.employee.Id = <number><unknown>position;
+    this.employee.Id = <number><unknown>position.Id;
     this.employeeCRUDService.getEmployee(this.employee.Id).subscribe
       (
-        (result) => { this.employee = result, console.log(result), this.hideLoader() },
+        (result) => { this.employee = result, console.log(result), this.hideLoader();
+        console.log($('#AddEditBtn').text('Update'))  
+      },
+
         (error) => { console.log(error), this.hideLoader() }
       )
     console.log('edit Employee Called')
     this.selected.setValue(0);
   }
 
+   isObjectEmpty(Obj) {
+    for(var key in Obj) {
+    if(Obj.hasOwnProperty(key))
+    return false;
+    }
+    return true;
+    }
 }
 
