@@ -87,6 +87,7 @@ export class SaloonEmployeesComponent implements OnInit,AfterViewInit{
     console.log('ngAfterViewInit()')
     console.log(this.paginator.page)
     console.log(this.paginator.pageIndex)
+    this.setCurrentPage(<number><unknown>this.paginator.pageIndex,<number><unknown>this.paginator.pageSize);
     this.paginator.page
       .pipe(
         tap(() => this.dataSource = this.employeeCRUDService.getAllEmployees( <number><unknown>this.paginator.pageIndex,<number><unknown>this.paginator.pageSize))
@@ -271,6 +272,21 @@ export class SaloonEmployeesComponent implements OnInit,AfterViewInit{
     return false;
     }
     return true;
+    }
+    //setter
+    setCurrentPage(pageNumber:number , pageSize:number)
+    {
+      this.pageNumber = pageNumber==0? 1 :pageNumber;
+      this.pageSize = pageSize;      
+    }
+    //getter
+    getCurrentPageNumber() : number
+    {
+      return this.pageNumber;
+    }
+    getCurrentPageSize() : number
+    {
+      return this.pageSize;
     }
 }
 

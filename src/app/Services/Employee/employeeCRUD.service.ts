@@ -60,6 +60,7 @@ export class EmployeeCRUDService  implements OnInit{
   }
   public getAllEmployees( page:number=1,pageItems:number=5) : Observable<Employee[]>
   {
+    page = page==0? page+1:page;
     return this.http.get<Employee[]>(this.API_ADDRESS+'/api/ShowAllEmployees/'+page+'/'+pageItems,this.httpOptions);
   }
   public getPaginInfo():Observable<string>
