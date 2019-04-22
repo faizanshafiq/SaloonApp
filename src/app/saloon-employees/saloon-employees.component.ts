@@ -134,6 +134,7 @@ export class SaloonEmployeesComponent implements OnInit,AfterViewInit{
   {
     this.employee = new Employee();
     $('#AddEditBtn').text('Add')
+    $('#alertText').text('Please add an employee')
   }
 
   Add(element) {
@@ -154,7 +155,7 @@ export class SaloonEmployeesComponent implements OnInit,AfterViewInit{
           }
           else
           { this.SuccessMessage()}
-          this.employee = new Employee()
+          this.Reset();
           this.dataSource = this.employeeCRUDService.getAllEmployees(this.pageNumber,this.pageSize);
         },
         (error) => {
@@ -277,11 +278,12 @@ export class SaloonEmployeesComponent implements OnInit,AfterViewInit{
       (
         (result) => { this.employee = result, console.log(result), this.hideLoader();
           $('#AddEditBtn').text('Update');  
+          $('#alertText').text('Update the employee')
       },
 
         (error) => { console.log(error), this.hideLoader() }
       )
-    console.log('edit Employee Called')
+     
     this.selected.setValue(0);
   }
 
