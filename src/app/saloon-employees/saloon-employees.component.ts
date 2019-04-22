@@ -38,6 +38,7 @@ export class SaloonEmployeesComponent implements OnInit,AfterViewInit{
   selected = new FormControl(0);
   pageNumber:number;
   pageSize:number;
+  
   applyFilter(filterValue: string) {
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
@@ -226,7 +227,7 @@ export class SaloonEmployeesComponent implements OnInit,AfterViewInit{
     this.showLoader();
     this.employeeCRUDService.removeEmployee(<number><unknown>this.position).subscribe((result) => {
       console.log(result);
-      this.dataSource = this.employeeCRUDService.getAllEmployees(this.pageNumber,this.pageSize);
+      this.dataSource = this.employeeCRUDService.getAllEmployees(<number><unknown>this.paginator.pageIndex,<number><unknown>this.paginator.pageSize);
       this.hideLoader();
     },
     (error)=> console.log(error)
