@@ -30,6 +30,7 @@ export class SaloonEmployeesComponent implements OnInit,AfterViewInit{
   employees: Employee[];
   employeeSource = new BehaviorSubject(this.employees);
   successMessage: Boolean;
+  updateMessage: Boolean;
   errorMessage: Boolean;
   position: string;
   displayedColumns: string[] = ['Id', 'FirstName', 'LastName', 'ContactNumber', 'UserName',  'Actions'];
@@ -135,19 +136,24 @@ export class SaloonEmployeesComponent implements OnInit,AfterViewInit{
     $('#AddEditBtn').text('Add')
   }
 
-  Add() {
+  Add(element) {
     this.showLoader();
     if(this.isObjectEmpty(this.employee)) {
      this.ErrorMessage();
      this.hideLoader();
+     return;
     }
     else
       {
         this.employeeCRUDService.addEditEmployee(this.employee).subscribe
       (
-        () => {
-          this.hideLoader(),
-            this.SuccessMessage()
+        (result) => {
+          this.hideLoader();
+          if(result=="Employee Updated"){
+            this.UpdateMessage();
+          }
+          else
+          { this.SuccessMessage()}
           this.employee = new Employee()
           this.dataSource = this.employeeCRUDService.getAllEmployees(this.pageNumber,this.pageSize);
         },
@@ -196,6 +202,18 @@ export class SaloonEmployeesComponent implements OnInit,AfterViewInit{
       this.successMessage = false;
     }
 
+  }
+  UpdateMessage()
+  {
+    if (!this.updateMessage) {
+      this.updateMessage = true;
+      $('.updateMessage').show();
+
+    }
+    else {
+      $('.updateMessage').hide();
+      this.updateMessage = false;
+    }
   }
 
   openDialog(position): void 
@@ -258,7 +276,7 @@ export class SaloonEmployeesComponent implements OnInit,AfterViewInit{
     this.employeeCRUDService.getEmployee(this.employee.Id).subscribe
       (
         (result) => { this.employee = result, console.log(result), this.hideLoader();
-        console.log($('#AddEditBtn').text('Update'))  
+          $('#AddEditBtn').text('Update');  
       },
 
         (error) => { console.log(error), this.hideLoader() }
